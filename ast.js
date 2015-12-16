@@ -26,10 +26,10 @@ glob('sample/d3/src/**/*.js', function(err, files) {
       console.log(err);
     }
   }
+  var json = JSON.stringify(documents, null, 2);
+  fs.writeFileSync('documents.json', json);
 })
 
-var json = JSON.stringify(documents, null, 2);
-fs.writeFileSync('documents.json', json);
 
 // var rp = repl.start('> ')
 // rp.context.documents = documents;
