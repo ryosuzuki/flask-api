@@ -22,7 +22,7 @@ def get(key):
 
 
 def get_model():
-  if not os.pth.exists('hoge.model'):
+  if not os.pth.exists('documents.model'):
     i = 0
     with open('documents.json') as file:
       docs = json.load(file)
@@ -32,7 +32,7 @@ def get_model():
       i = i + 1
       sentences.append(sentence)
     model = doc2vec.Doc2Vec(sentences)
-    model.save('hoge.model')
+    model.save('documents.model')
 
   model = doc2vec.Doc2Vec.load('hoge.model')
   return model
