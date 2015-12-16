@@ -14,34 +14,21 @@ def hello():
 @app.route('/<key>', methods=['GET'])
 def get(key):
   try:
-    model = get_model()
-    json = model.most_similar_words(key)
-    return jsonify(json)
+    model = doc2vec.Doc2Vec.load('documents.model')
+    data = model.most_similar_words(key)
+    data = model.most_similar_labels(key)
+
+    data = [
+      { "id": "4e9fca2d", "message": "Hoge", "code": "def foo\n  return true\nend" },
+      { "id": "359fc02c", "message": "Fuga", "code": "hoge hoge" },
+      { "id": "5e32c32a", "message": "Feof", "code": "def bar\n  return false\nend" },
+    ]
+    return jsonify({ "data": data })
   except IOError as err:
     return err
 
-
-def get_model():
-  if not os.pth.exists('documents.model'):
-    i = 0
-    with open('documents.json') as file:
-      docs = json.load(file)
-    sentences = []
-    for doc in docs:
-      sentence = doc2vec.LabeledSentence(words=doc, labels=['DOC_%s' % i])
-      i = i + 1
-      sentences.append(sentence)
-    model = doc2vec.Doc2Vec(sentences)
-    model.save('documents.model')
-
-  model = doc2vec.Doc2Vec.load('hoge.model')
-  return model
-
-
-
 if __name__ == "__main__":
-  app.run(debug=True)
-
+  app.run(port=3000, debug=True)
 
 
 # $ pip install -U https://github.com/satomacoto/gensim/archive/doc2vec-mostSimilarWordsAndLabels.zip

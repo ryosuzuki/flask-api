@@ -6,23 +6,19 @@ from gensim.models import doc2vec
 import json
 import sys
 
-with open('documents.json') as file:
-  docs = json.load(file)
+def init():
+  with open('documents.json') as file:
+    docs = json.load(file)
+  i, sentences = 0, []
+  for doc in docs:
+    sentence = doc2vec.LabeledSentence(words=doc, labels=['DOC_%s' % i])
+    i = i + 1
+    sentences.append(sentence)
+  model = doc2vec.Doc2Vec(sentences)
+  model.save('documents.model')
+  return model
 
-i = 0
-sentences = []
-for doc in docs:
-  sentence = doc2vec.LabeledSentence(words=doc, labels=['SENT_%s' % i])
-  i = i + 1
-  sentences.append(sentence)
-labeledSentences = doc2vec.LabeledListSentence(docs)
-
-model = doc2vec.Doc2Vec(sentences)
-model.most_similar_words('d3')
-print model.most_similar_labels('SENT_30')
-
-print sys.argv
-
+init()
 
 # sentences = word2vec.Text8Corpus('hoge.txt')
 # model = word2vec.Word2vec(sentences)
