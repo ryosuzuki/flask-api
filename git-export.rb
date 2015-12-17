@@ -2,24 +2,28 @@ require 'git_diff_parser'
 require 'rugged'
 require 'json'
 
-repo = Rugged::Repository.new('sample/sift')
+repo = Rugged::Repository.new('sample/d3')
 walker = Rugged::Walker.new(repo)
-# walker.sorting(Rugged::SORT_DATE)
+walker.sorting(Rugged::SORT_DATE)
 walker.push(repo.head.target)
 commits = {}
 i = 0
-walker.each do |commit|
-  id = commit.oid
-  hash = {
-    id: id,
-    message: commit.message,
-    patch: commit.diff.patch,
-  }
-  hash[:words] = hash[:patch].split(/(\s|,|;|\.|\(|\))/)
-  commits[id] = hash
-  print "\s#{i}"
-  i = i+1
-  break if (i > 0)
+walker.to_a[3490..3503].each do |commit|
+  begin
+    print "\s#{i}"
+    id = commit.oid
+    hash = {
+      id: id,
+      message: commit.message.force_encoding('UTF-8'),
+      patch: commit.diff.patch.force_encoding('UTF-8'),
+    }
+    hash[:words] = hash[:patch].split(/(\s|,|;|\.|\(|\))/)
+    i = i+1
+    commits[id] = hash
+  rescue
+    puts "error #{i}"
+    next
+  end
 end
 
 File.open('documents.json', 'w') do |f|
