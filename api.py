@@ -5,7 +5,8 @@ import os.path
 
 
 app = Flask(__name__)
-
+with open('documents.json') as file:
+  data = json.load(file)
 
 @app.route('/', methods=['GET'])
 def hello():
@@ -14,16 +15,19 @@ def hello():
 @app.route('/<key>', methods=['GET'])
 def get(key):
   try:
+    res = {}
     model = doc2vec.Doc2Vec.load('documents.model')
-    data = model.most_similar_words(key)
-    data = model.most_similar_labels(key)
-
-    data = [
-      { "id": "4e9fca2d", "message": "Hoge", "code": "def foo\n  return true\nend" },
-      { "id": "359fc02c", "message": "Fuga", "code": "hoge hoge" },
-      { "id": "5e32c32a", "message": "Feof", "code": "def bar\n  return false\nend" },
-    ]
-    return jsonify({ "data": data })
+    # data = model.most_similar_words(key)
+    labels = model.most_similar_labels(key)
+    res['_similarity'] = labels
+    commits = []
+    for label in labels:
+      id = label[0]
+      commit = data[id]
+      commit.pop('words', None)
+      commits.append(commit)
+    res['commits'] = commits
+    return jsonify(res)
   except IOError as err:
     return err
 
